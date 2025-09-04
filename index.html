@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>사진 분위기 분석기</title>
+</head>
+<body>
+    <h1>사진 분위기 분석기</h1>
+    <input type="file" id="imageInput" accept="image/*">
+    <button onclick="analyzeImage()">분석하기</button>
+    
+    <pre id="result"></pre>
+
+    <script>
+        async function analyzeImage() {
+            const fileInput = document.getElementById('imageInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("사진을 선택해주세요.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            document.getElementById('result').textContent = "분석 중...";
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/analyze_mood', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                document.getElementById('result').textContent = `에러 발생: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
